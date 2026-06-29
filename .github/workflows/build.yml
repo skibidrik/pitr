@@ -1,4 +1,4 @@
-name: Build Ghost ESP
+name: Build Ghost ESP Fixed
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -9,10 +9,15 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Patch Framework Settings
+        run: |
+          echo "CONFIG_COMPILER_CXX_EXCEPTIONS=y" >> sdkconfig
+          echo "CONFIG_COMPILER_ERRORS_TREAT_WARNINGS_AS_ERRORS=n" >> sdkconfig
+
       - name: Build with ESP-IDF
         uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v4.4.7
+          esp_idf_version: v5.1.2
           target: esp32
           path: '.'
 
