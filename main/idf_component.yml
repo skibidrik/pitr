@@ -1,3 +1,2 @@
 dependencies:
   lvgl/lvgl: "8.3.11"
-  m5stack/M5GFX: "^0.1.16"
