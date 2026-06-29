@@ -12,8 +12,8 @@ foreach(inc_dir ${inc_dirs})
     endif()
 endforeach()
 
-# Регистрируем компонент, используя универсальные относительные пути ESP-IDF
+# Регистрируем компонент без модуля mdns
 idf_component_register(SRCS ${app_sources} "vendor/m5gfx_wrapper.cpp"
                        INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include"
-                       REQUIRES bt nvs_flash driver esp_http_server mdns json esp_http_client mbedtls fatfs sdmmc wpa_supplicant
+                       REQUIRES bt nvs_flash driver esp_http_server json esp_http_client mbedtls fatfs sdmmc wpa_supplicant
 )
