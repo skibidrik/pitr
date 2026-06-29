@@ -15,6 +15,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+// Подключаем низкоуровневые регистры для отключения Brownout защиты
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
+
 int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3){
   return 0;
 }
@@ -30,6 +34,9 @@ int custom_vprintf(const char *fmt, va_list args)
 extern uint32_t lv_timer_handler(void);
 
 void app_main(void) {
+  // ЧИТ-КОД: Полностью отключаем аппаратный Brownout детектор при старте
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+
   // Запускаем штатные менеджеры Ghost ESP
   system_manager_init();
   serial_manager_init();
