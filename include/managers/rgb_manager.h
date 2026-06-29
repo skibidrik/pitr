@@ -4,6 +4,7 @@
 #include "driver/gpio.h"
 #include "vendor/led/led_strip.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 // Struct for the RGB manager (addressable LED strip)
 typedef struct {
