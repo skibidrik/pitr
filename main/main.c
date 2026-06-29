@@ -15,10 +15,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// Подключаем низкоуровневые регистры для отключения Brownout защиты
-#include "soc/soc.h"
-#include "soc/rtc_cntl_reg.h"
-
 int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3){
   return 0;
 }
@@ -33,9 +29,23 @@ int custom_vprintf(const char *fmt, va_list args)
 
 extern uint32_t lv_timer_handler(void);
 
+// Функция просто деликатно «будит» контроллер экрана на старте
+void force_init_ssd1306(void) {
+    i2c_config_t conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = 21,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_io_num = 22,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = 100000,
+    };
+    i2c_param_config(I2C_NUM_0, &conf);
+    i2c_driver_install(I2C_NUM_0, conf.mode, 0, 0, 0);
+}
+
 void app_main(void) {
-  // ЧИТ-КОД: Полностью отключаем аппаратный Brownout детектор при старте
-  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+  // Пробуждаем шину
+  force_init_ssd1306();
 
   // Запускаем штатные менеджеры Ghost ESP
   system_manager_init();
@@ -57,7 +67,7 @@ void app_main(void) {
 
   esp_err_t err = sd_card_init();
 
-  // Запускаем штатный дисплей-менеджер прошивки
+  // Запускаем штатный дисплей-менеджер прошивки (он сам развернёт буфер)
   display_manager_init();
 
   // Фоновый цикл обновления графической библиотеки LVGL
