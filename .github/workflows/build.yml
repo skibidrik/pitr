@@ -9,6 +9,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Download LVGL Component
+        run: |
+          mkdir -p components
+          git clone --depth 1 -b v8.3.11 https://github.com components/lvgl
+
       - name: Patch Framework Settings
         run: |
           echo "CONFIG_COMPILER_CXX_EXCEPTIONS=y" >> sdkconfig
