@@ -27,14 +27,10 @@ int custom_vprintf(const char *fmt, va_list args)
   return len;
 }
 
-// Объявляем внешнюю функцию обработки задач графической библиотеки
 extern uint32_t lv_timer_handler(void);
 
-// Объявляем структуру главного меню из файла main_menu_screen.c
-extern View main_menu_screen;
-
 void app_main(void) {
-  // Запускаем системные менеджеры прошивки
+  // Запускаем штатные менеджеры Ghost ESP
   system_manager_init();
   serial_manager_init();
   wifi_manager_init();
@@ -54,13 +50,10 @@ void app_main(void) {
 
   esp_err_t err = sd_card_init();
 
-  // Принудительно запускаем штатный графический движок прошивки
+  // Запускаем штатный дисплей-менеджер прошивки
   display_manager_init();
 
-  // Насильно переключаем отображение на структуру главного меню Ghost ESP
-  display_manager_switch_view(&main_menu_screen);
-
-  // Бесконечный цикл обработки графики
+  // Фоновый цикл обновления графической библиотеки LVGL
   while(1) {
       vTaskDelay(pdMS_TO_TICKS(10));
       lv_timer_handler(); 
