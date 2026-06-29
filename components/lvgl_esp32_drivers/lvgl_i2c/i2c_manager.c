@@ -144,7 +144,7 @@ esp_err_t I2C_FN(_init)(i2c_port_t port) {
 				conf.scl_io_num = CONFIG_I2C_MANAGER_0_SCL;
 				conf.sda_pullup_en = I2C_MANAGER_0_PULLUPS ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
 				conf.scl_pullup_en = conf.sda_pullup_en;
-				conf.master.clk_speed = CONFIG_I2C_MANAGER_0_FREQ_HZ;
+				conf.master.clk_speed = 100000;
 			}
 #endif
 
@@ -154,7 +154,7 @@ esp_err_t I2C_FN(_init)(i2c_port_t port) {
 				conf.scl_io_num = CONFIG_I2C_MANAGER_1_SCL;
 				conf.sda_pullup_en = I2C_MANAGER_1_PULLUPS ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
 				conf.scl_pullup_en = conf.sda_pullup_en;
-				conf.master.clk_speed = CONFIG_I2C_MANAGER_1_FREQ_HZ;
+				conf.master.clk_speed = 100000;
 			}
 #endif
 
