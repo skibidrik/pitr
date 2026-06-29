@@ -126,7 +126,9 @@ void ssd1306_init(void)
         OLED_CMD_SET_CONTRAST,
         0xFF,
         display_mode,
-        OLED_CMD_DISPLAY_ON
+        OLED_CMD_DISPLAY_ON,
+        OLED_CMD_SET_COM_PIN_MAP,
+        0x02
     };
 
     uint8_t err = send_data(NULL, conf, sizeof(conf));
