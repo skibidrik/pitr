@@ -13,14 +13,14 @@ jobs:
         run: |
           echo "CONFIG_COMPILER_CXX_EXCEPTIONS=y" >> sdkconfig
           echo "CONFIG_COMPILER_ERRORS_TREAT_WARNINGS_AS_ERRORS=n" >> sdkconfig
+          echo "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE=y" >> sdkconfig
 
       - name: Build with ESP-IDF
-        run: |
-          export EXTRA_CFLAGS="-w"
-          export EXTRA_CXXFLAGS="-w"
-          # Используем команду напрямую для сборки проекта
-          . /opt/esp/idf/export.sh
-          idf.py build
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.1.2
+          target: esp32
+          path: '.'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
