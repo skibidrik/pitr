@@ -1,0 +1,23 @@
+name: Build Ghost ESP
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Build with ESP-IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v4.4.7
+          target: esp32
+          path: '.'
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ghost-esp-bin
+          path: build/
