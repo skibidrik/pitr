@@ -13,6 +13,7 @@ jobs:
         run: |
           echo "CONFIG_COMPILER_CXX_EXCEPTIONS=y" >> sdkconfig
           echo "CONFIG_COMPILER_ERRORS_TREAT_WARNINGS_AS_ERRORS=n" >> sdkconfig
+          echo "CONFIG_MDNS_MAX_SERVICES=0" >> sdkconfig
 
       - name: Build with ESP-IDF
         uses: espressif/esp-idf-ci-action@v1
