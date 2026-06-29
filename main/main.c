@@ -16,10 +16,7 @@
 #include "driver/i2c.h"
 #include "freertos/task.h"
 
-// Принудительно подключаем заставку экрана Ghost ESP
-#include "managers/views/splash_screen.h"
-
-// Конфигурация вашего экрана — ИСПОЛЬЗУЕМ ЗАЩИЩЕННЫЕ АППАРАТНЫЕ ПИНЫ 21 И 22
+// Конфигурация вашего экрана — АППАРАТНЫЕ ПИНЫ 21 И 22
 #define I2C_MASTER_SDA_IO 21        // SDA подключаем к пину D21
 #define I2C_MASTER_SCL_IO 22        // SCL подключаем к пину D22
 #define I2C_MASTER_FREQ_HZ 100000   // Безопасная скорость шины 100 кГц
@@ -114,21 +111,9 @@ void app_main(void) {
 
   esp_err_t err = sd_card_init();
 
-  // Полностью вырезали проверки условий: теперь графическая оболочка запустится принудительно
+  // Инициализируем графическую оболочку Ghost ESP принудительно
   display_manager_init();
-  display_manager_switch_view(&splash_view);
-
-#ifdef LED_DATA_PIN
-  rgb_manager_init(&rgb_manager, LED_DATA_PIN, NUM_LEDS, LED_ORDER, LED_MODEL_WS2812, GPIO_NUM_NC, GPIO_NUM_NC, GPIO_NUM_NC);
-  if (settings_get_rgb_mode(&G_Settings) == 1)
-  {
-    xTaskCreate(rainbow_task, "Rainbow Task", 8192, &rgb_manager, 1, &rgb_effect_task_handle);
-  }
-#elif CONFIG_IDF_TARGET_ESP32S2
-  rgb_manager_init(&rgb_manager, GPIO_NUM_NC, 1, LED_PIXEL_FORMAT_GRB, LED_MODEL_WS2812, 4, 5, 6);
-  if (settings_get_rgb_mode(&G_Settings) == 1)
-  {
-    xTaskCreate(rainbow_task, "Rainbow Task", 8192, &rgb_manager, 1, &rgb_effect_task_handle);
-  }
-#endif
+  
+  // Включаем вывод текстовой консоли на экран напрямую в обход забагованной тяжелой заставки
+  display_manager_fill_screen(0); // Дополнительно очищаем холст библиотеки
 }
