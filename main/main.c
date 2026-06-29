@@ -27,8 +27,11 @@ int custom_vprintf(const char *fmt, va_list args)
   return len;
 }
 
-// Объявляем внешнюю функцию обработки задач с правильным типом возвращаемого значения uint32_t
+// Объявляем внешнюю функцию обработки задач графической библиотеки
 extern uint32_t lv_timer_handler(void);
+
+// Объявляем структуру главного меню из файла main_menu_screen.c
+extern View main_menu_screen;
 
 void app_main(void) {
   // Запускаем системные менеджеры прошивки
@@ -53,6 +56,9 @@ void app_main(void) {
 
   // Принудительно запускаем штатный графический движок прошивки
   display_manager_init();
+
+  // Насильно переключаем отображение на структуру главного меню Ghost ESP
+  display_manager_switch_view(&main_menu_screen);
 
   // Бесконечный цикл обработки графики
   while(1) {
