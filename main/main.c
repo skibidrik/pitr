@@ -16,13 +16,13 @@
 #include "driver/i2c.h"
 #include "freertos/task.h"
 
-// Принудительно подключаем заставку экрана
+// Принудительно подключаем заставку экрана Ghost ESP
 #include "managers/views/splash_screen.h"
 
 // Конфигурация вашего экрана
 #define I2C_MASTER_SDA_IO 33
 #define I2C_MASTER_SCL_IO 32
-#define I2C_MASTER_FREQ_HZ 400000
+#define I2C_MASTER_FREQ_HZ 100000   // Безопасная скорость шины 100 кГц (как в Arduino IDE)
 #define SSD1306_I2C_ADDRESS 0x3C
 
 // Функция низкоуровневой отправки команды в SSD1306/SSD1315
@@ -37,7 +37,7 @@ void ssd1306_cmd(uint8_t cmd) {
     i2c_cmd_link_delete(link);
 }
 
-// Принудительное включение экрана под стандарт фреймворка ESP-IDF v5.x
+// Принудительное включение экрана под стандарт фреймворка ESP-IDF v5.x и очистка мусора
 void force_init_ssd1306(void) {
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
@@ -53,6 +53,17 @@ void force_init_ssd1306(void) {
     ssd1306_cmd(0xAE); // Выключить дисплей
     ssd1306_cmd(0x8D); // Включить внутренний Charge Pump (накачку питания)
     ssd1306_cmd(0x14); 
+    
+    // Сброс и принудительная очистка видеопамяти контроллера от случайных точек (шума)
+    ssd1306_cmd(0x20); // Установка режима адресации памяти
+    ssd1306_cmd(0x00); // Горизонтальная адресация
+    ssd1306_cmd(0x21); // Сброс диапазона колонок
+    ssd1306_cmd(0x00); // Начало
+    ssd1306_cmd(127);  // Конец (128 пикселей)
+    ssd1306_cmd(0x22); // Сброс диапазона страниц
+    ssd1306_cmd(0x00); // Начало
+    ssd1306_cmd(7);    // Конец (64 пикселя)
+    
     ssd1306_cmd(0xAF); // Включить дисплей обратно
 }
 
@@ -91,7 +102,7 @@ void app_main(void) {
 
   esp_err_t err = sd_card_init();
 
-  // Полностью вырезали проверки условий: теперь интерфейс запустится в любом случае!
+  // Полностью вырезали проверки условий: теперь интерфейс запустится принудительно
   display_manager_init();
   display_manager_switch_view(&splash_view);
 
