@@ -19,10 +19,10 @@
 // Принудительно подключаем заставку экрана Ghost ESP
 #include "managers/views/splash_screen.h"
 
-// Конфигурация вашего экрана
-#define I2C_MASTER_SDA_IO 33
-#define I2C_MASTER_SCL_IO 32
-#define I2C_MASTER_FREQ_HZ 100000   // Безопасная скорость шины 100 кГц (как в Arduino IDE)
+// Конфигурация вашего экрана — ПЕРЕВЕЛИ НА СТАНДАРТНЫЕ ПИНЫ 21 И 22
+#define I2C_MASTER_SDA_IO 21        // Теперь SDA на пине D21
+#define I2C_MASTER_SCL_IO 22        // Теперь SCL на пине D22
+#define I2C_MASTER_FREQ_HZ 100000   // Безопасная скорость шины 100 кГц
 #define SSD1306_I2C_ADDRESS 0x3C
 
 // Функция низкоуровневой отправки команды в SSD1306/SSD1315
@@ -80,7 +80,7 @@ int custom_vprintf(const char *fmt, va_list args)
 }
 
 void app_main(void) {
-  // Насильно инициализируем ваш дисплей на пинах 33/32 при старте ESP32
+  // Насильно инициализируем ваш дисплей на пинах 21/22 при старте ESP32
   force_init_ssd1306();
 
   system_manager_init();
