@@ -19,9 +19,9 @@
 // Принудительно подключаем заставку экрана Ghost ESP
 #include "managers/views/splash_screen.h"
 
-// Конфигурация вашего экрана — ПЕРЕВЕЛИ НА СТАНДАРТНЫЕ ПИНЫ 21 И 22
-#define I2C_MASTER_SDA_IO 21        // Теперь SDA на пине D21
-#define I2C_MASTER_SCL_IO 22        // Теперь SCL на пине D22
+// Конфигурация вашего экрана — ИСПОЛЬЗУЕМ ЗАЩИЩЕННЫЕ АППАРАТНЫЕ ПИНЫ 21 И 22
+#define I2C_MASTER_SDA_IO 21        // SDA подключаем к пину D21
+#define I2C_MASTER_SCL_IO 22        // SCL подключаем к пину D22
 #define I2C_MASTER_FREQ_HZ 100000   // Безопасная скорость шины 100 кГц
 #define SSD1306_I2C_ADDRESS 0x3C
 
@@ -37,7 +37,7 @@ void ssd1306_cmd(uint8_t cmd) {
     i2c_cmd_link_delete(link);
 }
 
-// Принудительное включение экрана под стандарт фреймворка ESP-IDF v5.x и очистка мусора
+// Принудительное включение экрана под стандарт фреймворка ESP-IDF v5.x и полная очистка шума
 void force_init_ssd1306(void) {
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
@@ -54,17 +54,29 @@ void force_init_ssd1306(void) {
     ssd1306_cmd(0x8D); // Включить внутренний Charge Pump (накачку питания)
     ssd1306_cmd(0x14); 
     
-    // Сброс и принудительная очистка видеопамяти контроллера от случайных точек (шума)
-    ssd1306_cmd(0x20); // Установка режима адресации памяти
-    ssd1306_cmd(0x00); // Горизонтальная адресация
+    // Настройка адресации памяти для принудительного стирания случайных точек
+    ssd1306_cmd(0x20); // Режим адресации памяти
+    ssd1306_cmd(0x00); // Горизонтальный режим
     ssd1306_cmd(0x21); // Сброс диапазона колонок
-    ssd1306_cmd(0x00); // Начало
-    ssd1306_cmd(127);  // Конец (128 пикселей)
+    ssd1306_cmd(0x00); // Начало (0)
+    ssd1306_cmd(127);  // Конец (127 пикселей)
     ssd1306_cmd(0x22); // Сброс диапазона страниц
-    ssd1306_cmd(0x00); // Начало
-    ssd1306_cmd(7);    // Конец (64 пикселя)
+    ssd1306_cmd(0x00); // Начало (0)
+    ssd1306_cmd(7);    // Конец (7 страниц по 8 бит = 64 пикселя)
     
-    ssd1306_cmd(0xAF); // Включить дисплей обратно
+    // Забиваем всю видеопамять матрицы (1024 байта) чистыми нулями, стирая белый шум
+    for (int i = 0; i < 1024; i++) {
+        i2c_cmd_handle_t link = i2c_cmd_link_create();
+        i2c_master_start(link);
+        i2c_master_write_byte(link, (SSD1306_I2C_ADDRESS << 1) | I2C_MASTER_WRITE, true);
+        i2c_master_write_byte(link, 0x40, true); // Передаем байт данных
+        i2c_master_write_byte(link, 0x00, true); // Пустой пиксель (черный цвет)
+        i2c_master_stop(link);
+        i2c_master_cmd_begin(I2C_NUM_0, link, pdMS_TO_TICKS(10));
+        i2c_cmd_link_delete(link);
+    }
+    
+    ssd1306_cmd(0xAF); // Включить очищенный дисплей обратно
 }
 
 int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3){
@@ -73,7 +85,7 @@ int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3){
 
 int custom_vprintf(const char *fmt, va_list args)
 {
-  char buffer[256];
+  char buffer;
   int len = vsnprintf(buffer, sizeof(buffer), fmt, args);
   ap_manager_add_log(buffer);
   return len;
@@ -102,7 +114,7 @@ void app_main(void) {
 
   esp_err_t err = sd_card_init();
 
-  // Полностью вырезали проверки условий: теперь интерфейс запустится принудительно
+  // Полностью вырезали проверки условий: теперь графическая оболочка запустится принудительно
   display_manager_init();
   display_manager_switch_view(&splash_view);
 
