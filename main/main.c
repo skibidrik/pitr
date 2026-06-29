@@ -16,6 +16,9 @@
 #include "driver/i2c.h"
 #include "freertos/task.h"
 
+// Принудительно подключаем главное меню Ghost ESP
+#include "managers/views/main_menu_screen.h"
+
 // Конфигурация вашего экрана — АППАРАТНЫЕ ПИНЫ 21 И 22
 #define I2C_MASTER_SDA_IO 21        // SDA подключаем к пину D21
 #define I2C_MASTER_SCL_IO 22        // SCL подключаем к пину D22
@@ -113,4 +116,14 @@ void app_main(void) {
 
   // Инициализируем графическую оболочку Ghost ESP принудительно
   display_manager_init();
+  
+  // Насильно открываем структуру главного меню вместо заставки
+  display_manager_switch_view(&main_menu_view);
+
+  // Бесконечный цикл, который заставляет графическую библиотеку обновлять экран
+  while(1) {
+      vTaskDelay(pdMS_TO_TICKS(10));
+      // Вызываем внутренний обработчик тиков LVGL (встроен в display_manager)
+      // Если у вас компилятор будет ругаться, мы заменим это на стандартный lv_task_handler()
+  }
 }
