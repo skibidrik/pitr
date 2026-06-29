@@ -12,8 +12,9 @@ foreach(inc_dir ${inc_dirs})
     endif()
 endforeach()
 
-# Регистрируем компонент без модуля mdns
+# Регистрируем компонент с корректным списком требований, включая mdns
 idf_component_register(SRCS ${app_sources} "vendor/m5gfx_wrapper.cpp"
                        INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include"
+                       PRIV_REQUIRES mdns
                        REQUIRES bt nvs_flash driver esp_http_server json esp_http_client mbedtls fatfs sdmmc wpa_supplicant
 )
