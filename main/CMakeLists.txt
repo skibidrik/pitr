@@ -1,4 +1,19 @@
-idf_component_register(SRCS "main.c"
-                    INCLUDE_DIRS "."
-                    PRIV_REQUIRES mbedtls esp_wifi wifi_provisioning
+# Автоматический поиск всех файлов .c в папке main
+file(GLOB_RECURSE app_sources "${CMAKE_SOURCE_DIR}/main/*.c")
+
+# Автоматический поиск всех папок для заголовочных файлов в include
+file(GLOB_RECURSE inc_dirs LIST_DIRECTORIES true "${CMAKE_SOURCE_DIR}/include/*")
+
+# Очистка списка, оставляем только директории
+set(filtered_inc_dirs "")
+foreach(inc_dir ${inc_dirs})
+    if(IS_DIRECTORY ${inc_dir})
+        list(APPEND filtered_inc_dirs ${inc_dir})
+    endif()
+endforeach()
+
+# Регистрируем компонент, используя универсальные относительные пути ESP-IDF
+idf_component_register(SRCS ${app_sources} "vendor/m5gfx_wrapper.cpp"
+                       INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include"
+                       REQUIRES bt nvs_flash driver esp_http_server mdns json esp_http_client mbedtls fatfs sdmmc wpa_supplicant
 )
