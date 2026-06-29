@@ -38,10 +38,10 @@ void ssd1306_cmd(uint8_t cmd) {
     i2c_cmd_link_delete(link);
 }
 
-// Принудительное включение экрана и вывод базового текста, если прошивка «ослепла»
+// Принудительное включение экрана под стандарт фреймворка ESP-IDF v5.x
 void force_init_ssd1306(void) {
-    // Настраиваем шину I2C на ваших пинах D33 и D32
-    i2c_config_config_t conf = {
+    // Настраиваем шину I2C на ваших пинах D33 и D32 через правильную структуру i2c_config_t
+    i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
         .sda_io_num = I2C_MASTER_SDA_IO,
         .sda_pullup_en = GPIO_PULLUP_ENABLE,
@@ -56,7 +56,7 @@ void force_init_ssd1306(void) {
     ssd1306_cmd(0xAE); // Выключить дисплей
     ssd1306_cmd(0x8D); // Включить внутренний Charge Pump (накачку питания)
     ssd1306_cmd(0x14); 
-    ssd1306_cmd(0xAF); // Включить дисплей обратно (экран должен дать пиксельный шум или засветиться)
+    ssd1306_cmd(0xAF); // Включить дисплей обратно (экран должен подать признаки жизни)
 }
 
 int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3){
