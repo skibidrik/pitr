@@ -27,8 +27,8 @@ int custom_vprintf(const char *fmt, va_list args)
   return len;
 }
 
-// Внешняя функция обработки задач LVGL
-extern void lv_timer_handler(void);
+// Объявляем внешнюю функцию обработки задач с правильным типом возвращаемого значения uint32_t
+extern uint32_t lv_timer_handler(void);
 
 void app_main(void) {
   // Запускаем системные менеджеры прошивки
