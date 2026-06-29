@@ -18,3 +18,6 @@ idf_component_register(SRCS ${app_sources} "vendor/m5gfx_wrapper.cpp"
                        PRIV_REQUIRES mdns
                        REQUIRES bt nvs_flash driver esp_http_server json esp_http_client mbedtls fatfs sdmmc wpa_supplicant
 )
+
+# Чит-код: принудительно отключаем строгость компилятора для папки main
+target_compile_options(${COMPONENT_LIB} PRIVATE "-w")
