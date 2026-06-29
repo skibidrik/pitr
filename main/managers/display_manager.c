@@ -428,26 +428,6 @@ void hardware_input_task(void *pvParameters) {
             }
         #endif
 
-//       #ifdef USE_TOUCHSCREEN
-//            touch_driver_read(&touch_driver, &touch_data);
-
-            if (touch_data.state == LV_INDEV_STATE_PR && !touch_active) {
-                touch_active = true;
-
-                InputEvent event;
-                event.type = INPUT_TYPE_TOUCH;
-                event.data.touch_data.point.x = touch_data.point.x;
-                event.data.touch_data.point.y = touch_data.point.y;
-                event.data.touch_data.state = touch_data.state;
-
-                if (xQueueSend(input_queue, &event, pdMS_TO_TICKS(10)) != pdTRUE) {
-                    printf("Failed to send touch input to queue\n");
-                }
-            }
-            else if (touch_data.state == LV_INDEV_STATE_REL && touch_active) {
-                touch_active = false;
-            }
-        #endif
 
         vTaskDelay(tick_interval);
     }
